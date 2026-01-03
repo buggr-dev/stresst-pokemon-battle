@@ -32,7 +32,6 @@ const battleElements = {
     playerPokemon: null,
     enemyPokemon: null,
     attackBtn: null,
-    switchBtn: null,
     userBadge: null
 };
 
@@ -216,7 +215,6 @@ function cacheBattleElements() {
     battleElements.playerPokemon = document.getElementById('player-pokemon');
     battleElements.enemyPokemon = document.getElementById('enemy-pokemon');
     battleElements.attackBtn = document.querySelector('.btn-attack');
-    battleElements.switchBtn = document.querySelector('.btn-switch');
     battleElements.userBadge = document.getElementById('user-badge');
 }
 
@@ -226,9 +224,6 @@ function cacheBattleElements() {
 function setupBattleEventListeners() {
     // Attack button
     battleElements.attackBtn.addEventListener('click', handleAttack);
-    
-    // Switch button
-    battleElements.switchBtn.addEventListener('click', handleSwitch);
     
     // Team Pokemon cards (using event delegation)
     battleElements.playerTeam.addEventListener('click', (e) => {
@@ -271,17 +266,6 @@ function handleAttack() {
     
     showBattleMessage('Attack! (Battle logic coming soon...)');
     console.log('Attack button clicked');
-}
-
-/**
- * Handles the switch Pokemon action.
- * TODO: Implement switch logic
- */
-function handleSwitch() {
-    if (gameState.isLoading) return;
-    
-    showBattleMessage('Click on a Pokemon in your team to switch!');
-    console.log('Switch button clicked');
 }
 
 /**
@@ -386,14 +370,11 @@ function showBattleMessage(message) {
  */
 function setButtonsEnabled(enabled) {
     battleElements.attackBtn.disabled = !enabled;
-    battleElements.switchBtn.disabled = !enabled;
     
     if (enabled) {
         battleElements.attackBtn.classList.remove('disabled');
-        battleElements.switchBtn.classList.remove('disabled');
     } else {
         battleElements.attackBtn.classList.add('disabled');
-        battleElements.switchBtn.classList.add('disabled');
     }
 }
 
