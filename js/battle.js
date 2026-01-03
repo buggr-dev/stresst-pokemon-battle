@@ -207,6 +207,7 @@ const battleElements = {
     playerPokemon: null,
     enemyPokemon: null,
     attackBtn: null,
+    resetBtn: null,
     userBadge: null
 };
 
@@ -456,6 +457,7 @@ function cacheBattleElements() {
     battleElements.playerPokemon = document.getElementById('player-pokemon');
     battleElements.enemyPokemon = document.getElementById('enemy-pokemon');
     battleElements.attackBtn = document.querySelector('.btn-attack');
+    battleElements.resetBtn = document.getElementById('reset-btn');
     battleElements.userBadge = document.getElementById('user-badge');
 }
 
@@ -465,6 +467,9 @@ function cacheBattleElements() {
 function setupBattleEventListeners() {
     // Attack button
     battleElements.attackBtn.addEventListener('click', handleAttack);
+    
+    // Reset button
+    battleElements.resetBtn.addEventListener('click', handleReset);
     
     // Team Pokemon cards (using event delegation)
     battleElements.playerTeam.addEventListener('click', (e) => {
@@ -559,6 +564,63 @@ function handlePokemonSelect(slot) {
     
     showBattleMessage(`Go, ${pokemon.name}! ${previousPokemon.name}, come back!`);
     console.log(`Switched from ${previousPokemon.name} to ${pokemon.name}`);
+}
+
+/**
+ * Handles the reset/start again action.
+ * Clears team, resets progress, and fetches new Pokemon.
+ */
+async function handleReset() {
+    if (gameState.isBattling) {
+        showBattleMessage("Can't reset during battle!");
+        return;
+    }
+    
+    // Confirm reset
+    if (!confirm('Are you sure you want to start again? This will reset your team and progress.')) {
+        return;
+    }
+    
+    // Reset game state
+    gameState.round = 1;
+    gameState.wins = 0;
+    gameState.isLoading = true;
+    gameState.activePlayerPokemon = 0;
+    
+    // Clear saved data
+    clearTeam();
+    resetBattleProgress();
+    
+    // Update UI
+    updateBattleUI();
+    renderBattle();
+    showBattleMessage('Starting fresh! Assembling a new team...');
+    setButtonsEnabled(false);
+    
+    // Fetch new team and enemy
+    try {
+        const team = await fetchRandomTeam(3);
+        const enemy = await fetchRandomPokemon();
+        
+        // Update game state
+        gameState.playerTeam = team;
+        gameState.enemyPokemon = enemy;
+        gameState.isLoading = false;
+        
+        // Save new team
+        saveTeam(team);
+        
+        // Re-render
+        renderBattle();
+        setButtonsEnabled(true);
+        
+        const teamNames = team.map(p => p.name).join(', ');
+        showBattleMessage(`New adventure begins! Your team: ${teamNames}. Battle against ${enemy.name}!`);
+    } catch (error) {
+        console.error('Failed to reset game:', error);
+        showBattleMessage('Failed to start new game. Please refresh the page.');
+        gameState.isLoading = false;
+    }
 }
 
 // ==========================================
