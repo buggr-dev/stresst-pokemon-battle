@@ -12,6 +12,7 @@ const gameState = {
     round: 1,
     wins: 0,
     isLoading: true,
+    isBattling: false,
     playerTeam: [
         { id: 1, name: '???', hp: 100, maxHp: 100, sprite: null },
         { id: 2, name: '???', hp: 100, maxHp: 100, sprite: null },
@@ -20,6 +21,173 @@ const gameState = {
     activePlayerPokemon: 0,
     enemyPokemon: { name: '???', hp: 100, maxHp: 100, sprite: null }
 };
+
+// ==========================================
+// Battle Sequence
+// ==========================================
+
+/**
+ * Runs the full battle sequence until one Pokemon faints.
+ * Executes turn by turn with visual updates.
+ */
+async function runBattleSequence() {
+    const playerPokemon = gameState.playerTeam[gameState.activePlayerPokemon];
+    const enemyPokemon = gameState.enemyPokemon;
+    
+    gameState.isBattling = true;
+    setButtonsEnabled(false);
+    
+    let turnCount = 0;
+    const maxTurns = 50; // Safety limit
+    
+    // Battle continues until one Pokemon faints
+    while (playerPokemon.hp > 0 && enemyPokemon.hp > 0 && turnCount < maxTurns) {
+        turnCount++;
+        
+        // Determine who attacks first based on strength (with some randomness)
+        const playerGoesFirst = determineTurnOrder(playerPokemon, enemyPokemon);
+        
+        if (playerGoesFirst) {
+            // Player attacks first
+            const playerResult = executeAttack(playerPokemon, enemyPokemon, true);
+            await showAttackResult(playerResult);
+            renderBattle();
+            
+            if (enemyPokemon.hp <= 0) break;
+            
+            await delay(800);
+            
+            // Enemy attacks
+            const enemyResult = executeAttack(enemyPokemon, playerPokemon, false);
+            await showAttackResult(enemyResult);
+            renderBattle();
+            saveTeam(gameState.playerTeam);
+        } else {
+            // Enemy attacks first
+            const enemyResult = executeAttack(enemyPokemon, playerPokemon, false);
+            await showAttackResult(enemyResult);
+            renderBattle();
+            saveTeam(gameState.playerTeam);
+            
+            if (playerPokemon.hp <= 0) break;
+            
+            await delay(800);
+            
+            // Player attacks
+            const playerResult = executeAttack(playerPokemon, enemyPokemon, true);
+            await showAttackResult(playerResult);
+            renderBattle();
+        }
+        
+        await delay(600);
+    }
+    
+    // Battle ended - determine outcome
+    await delay(500);
+    
+    if (enemyPokemon.hp <= 0) {
+        await handleBattleWin();
+    } else if (playerPokemon.hp <= 0) {
+        await handlePokemonFainted();
+    }
+    
+    gameState.isBattling = false;
+}
+
+/**
+ * Displays the result of an attack with animation delay.
+ * @param {Object} result - Attack result object
+ */
+async function showAttackResult(result) {
+    let message = `${result.attacker} attacks ${result.defender} for ${result.damage} damage!`;
+    
+    if (result.effectivenessMsg) {
+        message += ` ${result.effectivenessMsg}`;
+    }
+    
+    if (result.defenderFainted) {
+        message += ` ${result.defender} fainted!`;
+    }
+    
+    showBattleMessage(message);
+    await delay(1200);
+}
+
+/**
+ * Handles winning a battle against the enemy.
+ */
+async function handleBattleWin() {
+    gameState.wins++;
+    gameState.round++;
+    
+    // Record win and add coins
+    recordBattleResult(true);
+    addCoins(REWARDS.DEFEAT_POKEMON);
+    
+    const playerPokemon = gameState.playerTeam[gameState.activePlayerPokemon];
+    showBattleMessage(`${playerPokemon.name} defeated ${gameState.enemyPokemon.name}! You earned ${REWARDS.WIN_BATTLE + REWARDS.DEFEAT_POKEMON} coins!`);
+    
+    updateBattleUI();
+    
+    await delay(2000);
+    
+    // Fetch new enemy
+    showBattleMessage('A new challenger approaches...');
+    setButtonsEnabled(false);
+    
+    try {
+        const newEnemy = await fetchRandomPokemon();
+        gameState.enemyPokemon = newEnemy;
+        renderBattle();
+        showBattleMessage(`A wild ${newEnemy.name} appeared! Ready to battle?`);
+        setButtonsEnabled(true);
+    } catch (error) {
+        console.error('Failed to fetch new enemy:', error);
+        showBattleMessage('Failed to find a new challenger. Please refresh.');
+    }
+}
+
+/**
+ * Handles when the player's active Pokemon faints.
+ */
+async function handlePokemonFainted() {
+    const faintedPokemon = gameState.playerTeam[gameState.activePlayerPokemon];
+    saveTeam(gameState.playerTeam);
+    
+    // Check if any Pokemon are still alive
+    const alivePokemon = gameState.playerTeam.findIndex(p => p.hp > 0);
+    
+    if (alivePokemon >= 0) {
+        // Auto-switch to next available Pokemon
+        gameState.activePlayerPokemon = alivePokemon;
+        const nextPokemon = gameState.playerTeam[alivePokemon];
+        
+        showBattleMessage(`${faintedPokemon.name} fainted! Go, ${nextPokemon.name}!`);
+        renderBattle();
+        
+        await delay(1500);
+        setButtonsEnabled(true);
+        showBattleMessage(`${nextPokemon.name} is ready to battle!`);
+    } else {
+        // All Pokemon fainted - game over
+        recordBattleResult(false);
+        showBattleMessage(`All your Pokemon have fainted! Your streak of ${gameState.wins} wins has ended.`);
+        gameState.wins = 0;
+        updateBattleUI();
+        
+        await delay(2000);
+        showBattleMessage('Visit the Team page to revive your Pokemon, or refresh for a new team.');
+    }
+}
+
+/**
+ * Utility function for async delays.
+ * @param {number} ms - Milliseconds to delay
+ * @returns {Promise} Resolves after delay
+ */
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // ==========================================
 // DOM Elements
@@ -325,13 +493,28 @@ function loadUserData() {
 
 /**
  * Handles the attack action.
- * TODO: Implement actual battle logic with damage calculation
+ * Initiates the battle sequence if not already battling.
  */
 function handleAttack() {
-    if (gameState.isLoading) return;
+    if (gameState.isLoading || gameState.isBattling) return;
     
-    showBattleMessage('Attack! (Battle logic coming soon...)');
-    console.log('Attack button clicked');
+    const playerPokemon = gameState.playerTeam[gameState.activePlayerPokemon];
+    
+    // Check if active Pokemon can battle
+    if (playerPokemon.hp <= 0) {
+        showBattleMessage(`${playerPokemon.name} has fainted! Select another Pokemon.`);
+        return;
+    }
+    
+    // Check if all Pokemon are fainted
+    const hasAlivePokemon = gameState.playerTeam.some(p => p.hp > 0);
+    if (!hasAlivePokemon) {
+        showBattleMessage('All your Pokemon have fainted! Visit the Team page to revive them.');
+        return;
+    }
+    
+    // Start the battle sequence
+    runBattleSequence();
 }
 
 /**
@@ -339,6 +522,12 @@ function handleAttack() {
  * @param {number} slot - The slot index of the selected Pokemon (0-2)
  */
 function handlePokemonSelect(slot) {
+    // Can't switch during battle
+    if (gameState.isBattling) {
+        showBattleMessage("Can't switch Pokemon during battle!");
+        return;
+    }
+    
     const pokemon = gameState.playerTeam[slot];
     
     // Can't select fainted Pokemon
