@@ -33,6 +33,7 @@ const DEFAULT_PROFILE = {
 const STORAGE_KEY = 'pokemonBattleUser';
 const TEAM_STORAGE_KEY = 'pokemonBattleTeam';
 const BATTLE_PROGRESS_KEY = 'pokemonBattleProgress';
+const ENEMY_STORAGE_KEY = 'pokemonBattleEnemy';
 
 /** Coin costs for actions */
 const COSTS = {
@@ -317,6 +318,45 @@ function resetBattleProgress() {
 }
 
 // ==========================================
+// Enemy Pokemon Management
+// ==========================================
+
+/**
+ * Saves the current enemy Pokemon to localStorage.
+ * @param {Object} enemy - Enemy Pokemon object
+ */
+function saveEnemy(enemy) {
+    try {
+        localStorage.setItem(ENEMY_STORAGE_KEY, JSON.stringify(enemy));
+    } catch (error) {
+        console.error('Error saving enemy:', error);
+    }
+}
+
+/**
+ * Loads the enemy Pokemon from localStorage.
+ * @returns {Object|null} Enemy Pokemon or null if not found
+ */
+function loadEnemy() {
+    try {
+        const stored = localStorage.getItem(ENEMY_STORAGE_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error('Error loading enemy:', error);
+    }
+    return null;
+}
+
+/**
+ * Clears the saved enemy Pokemon.
+ */
+function clearEnemy() {
+    localStorage.removeItem(ENEMY_STORAGE_KEY);
+}
+
+// ==========================================
 // UI Helpers
 // ==========================================
 
@@ -423,6 +463,9 @@ if (typeof module !== 'undefined' && module.exports) {
         saveBattleProgress,
         loadBattleProgress,
         resetBattleProgress,
+        saveEnemy,
+        loadEnemy,
+        clearEnemy,
         renderUserBadge,
         renderAvatarGrid,
         formatNumber,

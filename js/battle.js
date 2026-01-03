@@ -141,6 +141,7 @@ async function handleBattleWin() {
     try {
         const newEnemy = await fetchRandomPokemon();
         gameState.enemyPokemon = newEnemy;
+        saveEnemy(newEnemy);
         renderBattle();
         showBattleMessage(`A wild ${newEnemy.name} appeared! Ready to battle?`);
         setButtonsEnabled(true);
@@ -194,6 +195,41 @@ async function handlePokemonFainted() {
  */
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Gets type effectiveness indicator HTML for a Pokemon against the enemy.
+ * @param {Object} pokemon - The player's Pokemon
+ * @param {Object} enemy - The enemy Pokemon
+ * @returns {string} HTML string for the indicator (or empty string if neutral)
+ */
+function getEffectivenessIndicator(pokemon, enemy) {
+    if (!pokemon || !enemy) return '';
+    
+    const playerTypes = pokemon.types || ['normal'];
+    const enemyTypes = enemy.types || ['normal'];
+    
+    // Check player's effectiveness against enemy
+    const playerVsEnemy = getTypeEffectiveness(playerTypes, enemyTypes);
+    // Check enemy's effectiveness against player
+    const enemyVsPlayer = getTypeEffectiveness(enemyTypes, playerTypes);
+    
+    // Determine overall matchup
+    if (playerVsEnemy >= 2 && enemyVsPlayer < 2) {
+        // Strong advantage
+        return '<span class="matchup-indicator matchup-advantage" title="Super effective!">⚔️</span>';
+    } else if (playerVsEnemy >= 2 && enemyVsPlayer >= 2) {
+        // Both super effective
+        return '<span class="matchup-indicator matchup-neutral" title="Both super effective">⚡</span>';
+    } else if (playerVsEnemy < 1 || enemyVsPlayer >= 2) {
+        // Disadvantage
+        return '<span class="matchup-indicator matchup-disadvantage" title="Not very effective...">🛡️</span>';
+    } else if (playerVsEnemy >= 1.5) {
+        // Slight advantage
+        return '<span class="matchup-indicator matchup-advantage" title="Effective">⚔️</span>';
+    }
+    
+    return '';
 }
 
 // ==========================================
@@ -250,8 +286,12 @@ function createPokemonCard(pokemon, slot, isActive) {
         `<span class="type-badge ${type}">${type}</span>`
     ).join('');
     
+    // Get matchup indicator against current enemy
+    const matchupIndicator = getEffectivenessIndicator(pokemon, gameState.enemyPokemon);
+    
     return `
         <div class="pokemon-card ${isActive ? 'active' : ''} ${isFainted ? 'fainted' : ''}" data-slot="${slot}">
+            ${matchupIndicator}
             <div class="card-sprite">
                 ${spriteContent}
             </div>
@@ -302,9 +342,17 @@ function createBattlePokemonCard(pokemon, isEnemy = false) {
         `<span class="type-badge ${type}">${type}</span>`
     ).join('');
     
+    // Get matchup indicator (only for player's Pokemon)
+    const matchupIndicator = !isEnemy 
+        ? getEffectivenessIndicator(pokemon, gameState.enemyPokemon)
+        : '';
+    
     const infoSection = `
         <div class="pokemon-info">
-            <span class="pokemon-name">${pokemon.name}</span>
+            <div class="pokemon-name-row">
+                <span class="pokemon-name">${pokemon.name}</span>
+                ${matchupIndicator}
+            </div>
             <div class="battle-types">${typeBadges}</div>
             <div class="health-bar">
                 <div class="health-fill ${healthClass}" style="width: ${hpPercent}%"></div>
@@ -413,8 +461,15 @@ async function loadPokemon() {
             saveTeam(team);
         }
         
-        // Always fetch a new enemy
-        const enemy = await fetchRandomPokemon();
+        // Check for existing saved enemy, otherwise fetch new one
+        let enemy = loadEnemy();
+        let isNewEnemy = false;
+        
+        if (!enemy) {
+            isNewEnemy = true;
+            enemy = await fetchRandomPokemon();
+            saveEnemy(enemy);
+        }
         
         // Update game state
         gameState.playerTeam = team;
@@ -435,10 +490,10 @@ async function loadPokemon() {
             showBattleMessage(`Your new team: ${teamNames}! Battle against ${enemy.name}!`);
         } else {
             const activePokemon = team[gameState.activePlayerPokemon];
-            showBattleMessage(`Go, ${activePokemon.name}! A wild ${enemy.name} appeared!`);
+            showBattleMessage(`Go, ${activePokemon.name}! ${isNewEnemy ? 'A wild' : 'Your opponent'} ${enemy.name} ${isNewEnemy ? 'appeared' : 'awaits'}!`);
         }
         
-        console.log('Pokemon loaded:', { team, enemy, isNewTeam });
+        console.log('Pokemon loaded:', { team, enemy, isNewTeam, isNewEnemy });
     } catch (error) {
         console.error('Failed to load Pokemon:', error);
         showBattleMessage('Failed to load Pokemon. Please refresh the page.');
@@ -589,6 +644,7 @@ async function handleReset() {
     
     // Clear saved data
     clearTeam();
+    clearEnemy();
     resetBattleProgress();
     
     // Update UI

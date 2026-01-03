@@ -511,6 +511,54 @@
 }
 
 /* ==========================================
+   Matchup Indicators
+   ========================================== */
+.matchup-indicator {
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    font-size: 1rem;
+    z-index: 5;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    cursor: help;
+}
+
+.matchup-advantage {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.matchup-disadvantage {
+    opacity: 0.8;
+}
+
+.matchup-neutral {
+    opacity: 0.9;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Pokemon name row for battle cards */
+.pokemon-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.pokemon-name-row .matchup-indicator {
+    position: static;
+    font-size: 1.1rem;
+}
+
+/* Make pokemon-card position relative for indicator */
+.pokemon-card {
+    position: relative;
+}
+
+/* ==========================================
    Reset Section
    ========================================== */
 .reset-section {
