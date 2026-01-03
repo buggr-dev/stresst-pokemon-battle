@@ -343,6 +343,19 @@ function formatNumber(num) {
     return num.toLocaleString();
 }
 
+/**
+ * Gets the strength tier based on strength score.
+ * @param {number} strength - Strength score (1-100)
+ * @returns {Object} Object with tier name and CSS class
+ */
+function getStrengthTier(strength) {
+    if (strength >= 80) return { name: 'S', class: 'strength-s' };
+    if (strength >= 60) return { name: 'A', class: 'strength-a' };
+    if (strength >= 40) return { name: 'B', class: 'strength-b' };
+    if (strength >= 20) return { name: 'C', class: 'strength-c' };
+    return { name: 'D', class: 'strength-d' };
+}
+
 // ==========================================
 // Export for module usage (if needed later)
 // ==========================================
@@ -369,6 +382,7 @@ if (typeof module !== 'undefined' && module.exports) {
         healAllPokemon,
         renderUserBadge,
         renderAvatarGrid,
-        formatNumber
+        formatNumber,
+        getStrengthTier
     };
 }

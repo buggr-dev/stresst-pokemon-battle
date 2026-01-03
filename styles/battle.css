@@ -103,6 +103,112 @@
     font-weight: 600;
 }
 
+/* Battle Types */
+.battle-types {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Battle Stats */
+.battle-stats {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.battle-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.battle-stat-value {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    color: var(--accent-gold);
+}
+
+.battle-stat-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* ==========================================
+   Type Badges
+   ========================================== */
+.type-badge {
+    font-size: 0.55rem;
+    padding: 2px 5px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: white;
+}
+
+/* Type colors */
+.type-badge.normal { background: #A8A878; }
+.type-badge.fire { background: #F08030; }
+.type-badge.water { background: #6890F0; }
+.type-badge.electric { background: #F8D030; color: #333; }
+.type-badge.grass { background: #78C850; }
+.type-badge.ice { background: #98D8D8; color: #333; }
+.type-badge.fighting { background: #C03028; }
+.type-badge.poison { background: #A040A0; }
+.type-badge.ground { background: #E0C068; color: #333; }
+.type-badge.flying { background: #A890F0; }
+.type-badge.psychic { background: #F85888; }
+.type-badge.bug { background: #A8B820; }
+.type-badge.rock { background: #B8A038; }
+.type-badge.ghost { background: #705898; }
+.type-badge.dragon { background: #7038F8; }
+.type-badge.dark { background: #705848; }
+.type-badge.steel { background: #B8B8D0; color: #333; }
+.type-badge.fairy { background: #EE99AC; color: #333; }
+
+/* ==========================================
+   Strength Badges
+   ========================================== */
+.strength-badge {
+    padding: 2px 5px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.65rem !important;
+}
+
+.strength-s {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #1a1a2e;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+}
+
+.strength-a {
+    background: linear-gradient(135deg, #9775fa 0%, #845ef7 100%);
+    color: white;
+}
+
+.strength-b {
+    background: linear-gradient(135deg, #339af0 0%, #228be6 100%);
+    color: white;
+}
+
+.strength-c {
+    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    color: white;
+}
+
+.strength-d {
+    background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);
+    color: white;
+}
+
 /* ==========================================
    Pokemon Sprites
    ========================================== */
@@ -299,6 +405,36 @@
 .card-status.active {
     background: var(--accent-gold);
     color: var(--bg-primary);
+    font-weight: 700;
+}
+
+/* Card Types */
+.card-types {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Card Stats */
+.card-stats {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-xs);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.card-stat {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.card-stat-value {
+    color: var(--accent-gold);
     font-weight: 700;
 }
 

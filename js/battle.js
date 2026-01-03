@@ -64,6 +64,16 @@ function createPokemonCard(pokemon, slot, isActive) {
         statusClass = 'active';
     }
     
+    // Get strength tier
+    const strength = pokemon.strength || 50;
+    const tier = getStrengthTier(strength);
+    
+    // Get types
+    const types = pokemon.types || [];
+    const typeBadges = types.map(type => 
+        `<span class="type-badge ${type}">${type}</span>`
+    ).join('');
+    
     return `
         <div class="pokemon-card ${isActive ? 'active' : ''} ${isFainted ? 'fainted' : ''}" data-slot="${slot}">
             <div class="card-sprite">
@@ -71,8 +81,14 @@ function createPokemonCard(pokemon, slot, isActive) {
             </div>
             <div class="card-info">
                 <span class="card-name">${pokemon.name}</span>
+                <div class="card-types">${typeBadges}</div>
                 <div class="mini-health-bar">
                     <div class="health-fill" style="width: ${hpPercent}%"></div>
+                </div>
+                <div class="card-stats">
+                    <span class="card-stat"><span class="card-stat-value">${pokemon.attack || '?'}</span> ATK</span>
+                    <span class="card-stat"><span class="card-stat-value">${pokemon.maxHp}</span> HP</span>
+                    <span class="card-stat"><span class="strength-badge ${tier.class}">${tier.name}</span> STR</span>
                 </div>
             </div>
             <div class="card-status ${statusClass}">${status}</div>
@@ -100,13 +116,38 @@ function createBattlePokemonCard(pokemon, isEnemy = false) {
         healthClass = 'health-mid';
     }
     
+    // Get strength tier
+    const strength = pokemon.strength || 50;
+    const tier = getStrengthTier(strength);
+    
+    // Get types
+    const types = pokemon.types || [];
+    const typeBadges = types.map(type => 
+        `<span class="type-badge ${type}">${type}</span>`
+    ).join('');
+    
     const infoSection = `
         <div class="pokemon-info">
             <span class="pokemon-name">${pokemon.name}</span>
+            <div class="battle-types">${typeBadges}</div>
             <div class="health-bar">
                 <div class="health-fill ${healthClass}" style="width: ${hpPercent}%"></div>
             </div>
             <span class="health-text">${pokemon.hp} / ${pokemon.maxHp}</span>
+            <div class="battle-stats">
+                <div class="battle-stat">
+                    <span class="battle-stat-value">${pokemon.attack || '?'}</span>
+                    <span class="battle-stat-label">ATK</span>
+                </div>
+                <div class="battle-stat">
+                    <span class="battle-stat-value">${pokemon.maxHp}</span>
+                    <span class="battle-stat-label">HP</span>
+                </div>
+                <div class="battle-stat">
+                    <span class="battle-stat-value strength-badge ${tier.class}">${tier.name}</span>
+                    <span class="battle-stat-label">STR</span>
+                </div>
+            </div>
         </div>
     `;
     
