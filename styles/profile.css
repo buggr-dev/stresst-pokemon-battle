@@ -1,0 +1,217 @@
+/* ==========================================
+   Profile Page Specific Styles
+   ========================================== */
+
+/* ==========================================
+   Profile Layout
+   ========================================== */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+/* ==========================================
+   Avatar Section
+   ========================================== */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.avatar-display {
+    position: relative;
+}
+
+.avatar-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.3),
+        inset 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-edit-hint {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 36px;
+    height: 36px;
+    background: var(--accent-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.avatar-edit-hint:hover {
+    transform: scale(1.1);
+}
+
+/* ==========================================
+   Avatar Picker Grid
+   ========================================== */
+.avatar-picker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    width: 100%;
+}
+
+.avatar-picker-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.avatar-option {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.avatar-option:hover {
+    background: var(--bg-card-hover);
+    transform: scale(1.1);
+}
+
+.avatar-option.selected {
+    border-color: var(--accent-gold);
+    background: var(--bg-card-hover);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* ==========================================
+   Profile Form
+   ========================================== */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+/* ==========================================
+   Stats Card
+   ========================================== */
+.stats-card {
+    margin-top: var(--spacing-lg);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+}
+
+.stat-item-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--accent-gold);
+}
+
+.stat-item-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ==========================================
+   Success Message
+   ========================================== */
+.save-message {
+    padding: var(--spacing-md);
+    background: rgba(81, 207, 102, 0.1);
+    border: 1px solid var(--accent-green);
+    border-radius: var(--radius-md);
+    color: var(--accent-green);
+    text-align: center;
+    font-weight: 600;
+    display: none;
+}
+
+.save-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   Responsive Design
+   ========================================== */
+@media (max-width: 768px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .avatar-large {
+        width: 120px;
+        height: 120px;
+        font-size: 3rem;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+

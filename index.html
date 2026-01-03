@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/shared.css">
+    <link rel="stylesheet" href="styles/battle.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="page-header">
+            <h1 class="page-title">Pokemon Battle</h1>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-link active">Battle</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </nav>
+            <a href="profile.html" class="user-badge" id="user-badge">
+                <div class="user-avatar">🎮</div>
+                <span class="user-name">Trainer</span>
+            </a>
+        </header>
+
+        <!-- Game Stats -->
+        <div class="game-stats">
+            <div class="stat">
+                <span class="stat-label">Round</span>
+                <span class="stat-value" id="round-counter">1</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Wins</span>
+                <span class="stat-value" id="win-counter">0</span>
+            </div>
+        </div>
+
+        <!-- Battle Arena -->
+        <main class="battle-arena">
+            <!-- Enemy Side -->
+            <section class="battle-side enemy-side" id="enemy-pokemon">
+                <!-- Rendered by JS -->
+            </section>
+
+            <!-- VS Divider -->
+            <div class="vs-divider">
+                <span>VS</span>
+            </div>
+
+            <!-- Player Side -->
+            <section class="battle-side player-side" id="player-pokemon">
+                <!-- Rendered by JS -->
+            </section>
+        </main>
+
+        <!-- Action Panel -->
+        <section class="action-panel">
+            <div class="message-box">
+                <p id="battle-message">Choose your Pokemon to begin the battle!</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-attack">Attack</button>
+                <button class="btn btn-switch">Switch</button>
+            </div>
+        </section>
+
+        <!-- Player Team -->
+        <section class="card">
+            <h2 class="card-title">Your Team</h2>
+            <div class="team-grid" id="player-team">
+                <!-- Pokemon cards rendered by JS -->
+            </div>
+        </section>
+    </div>
+
+    <script src="js/shared.js"></script>
+    <script src="js/battle.js"></script>
+</body>
+</html>
