@@ -8,6 +8,7 @@
 // DOM Elements
 // ==========================================
 const profileElements = {
+    userBadge: null,
     currentAvatar: null,
     avatarGrid: null,
     usernameInput: null,
@@ -41,6 +42,7 @@ function initProfile() {
  * Caches DOM elements for the profile page.
  */
 function cacheProfileElements() {
+    profileElements.userBadge = document.getElementById('user-badge');
     profileElements.currentAvatar = document.getElementById('current-avatar');
     profileElements.avatarGrid = document.getElementById('avatar-grid');
     profileElements.usernameInput = document.getElementById('username');
@@ -64,6 +66,9 @@ function loadProfileData() {
     // Set current avatar
     selectedAvatar = profile.avatar;
     profileElements.currentAvatar.textContent = profile.avatar;
+    
+    // Render user badge in header
+    renderHeaderBadge(profile);
     
     // Render avatar grid
     renderAvatarGrid('avatar-grid', handleAvatarSelect);
@@ -109,10 +114,13 @@ function handleAvatarSelect(avatar) {
 function handleSaveProfile() {
     const username = profileElements.usernameInput.value.trim() || 'Trainer';
     
-    updateUserProfile({
+    const profile = updateUserProfile({
         username: username,
         avatar: selectedAvatar
     });
+    
+    // Update header badge to reflect changes
+    renderHeaderBadge(profile);
     
     // Show success message
     showSaveMessage();
@@ -135,6 +143,19 @@ function handleResetStats() {
 // ==========================================
 // UI Updates
 // ==========================================
+
+/**
+ * Renders the user badge in the header.
+ * @param {Object} profile - User profile object
+ */
+function renderHeaderBadge(profile) {
+    if (profileElements.userBadge) {
+        profileElements.userBadge.innerHTML = `
+            <div class="user-avatar">${profile.avatar}</div>
+            <span class="user-name">${profile.username}</span>
+        `;
+    }
+}
 
 /**
  * Updates the stats display with profile data.
