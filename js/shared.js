@@ -20,6 +20,7 @@ const AVATAR_OPTIONS = [
 const DEFAULT_PROFILE = {
     username: 'Trainer',
     avatar: '🎮',
+    coins: 500,
     stats: {
         totalBattles: 0,
         totalWins: 0,
@@ -28,8 +29,22 @@ const DEFAULT_PROFILE = {
     }
 };
 
-/** localStorage key for user data */
+/** localStorage keys */
 const STORAGE_KEY = 'pokemonBattleUser';
+const TEAM_STORAGE_KEY = 'pokemonBattleTeam';
+
+/** Coin costs for actions */
+const COSTS = {
+    REVIVE: 50,
+    NEW_POKEMON: 100,
+    HEAL_ALL: 75
+};
+
+/** Coin rewards */
+const REWARDS = {
+    WIN_BATTLE: 25,
+    DEFEAT_POKEMON: 10
+};
 
 // ==========================================
 // User Data Management
@@ -119,12 +134,146 @@ function recordBattleResult(won) {
         if (profile.stats.currentStreak > profile.stats.bestStreak) {
             profile.stats.bestStreak = profile.stats.currentStreak;
         }
+        // Award coins for winning
+        profile.coins += REWARDS.WIN_BATTLE;
     } else {
         profile.stats.currentStreak = 0;
     }
     
     saveUserProfile(profile);
     return profile;
+}
+
+// ==========================================
+// Coins Management
+// ==========================================
+
+/**
+ * Gets the current coin balance.
+ * @returns {number} Current coins
+ */
+function getCoins() {
+    return getUserProfile().coins;
+}
+
+/**
+ * Adds coins to the user's balance.
+ * @param {number} amount - Amount to add
+ * @returns {number} New balance
+ */
+function addCoins(amount) {
+    const profile = getUserProfile();
+    profile.coins += amount;
+    saveUserProfile(profile);
+    return profile.coins;
+}
+
+/**
+ * Spends coins if user has enough.
+ * @param {number} amount - Amount to spend
+ * @returns {boolean} True if successful, false if insufficient funds
+ */
+function spendCoins(amount) {
+    const profile = getUserProfile();
+    if (profile.coins >= amount) {
+        profile.coins -= amount;
+        saveUserProfile(profile);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Checks if user can afford an amount.
+ * @param {number} amount - Amount to check
+ * @returns {boolean} True if user has enough coins
+ */
+function canAfford(amount) {
+    return getUserProfile().coins >= amount;
+}
+
+// ==========================================
+// Team Management
+// ==========================================
+
+/**
+ * Saves the player's team to localStorage.
+ * @param {Object[]} team - Array of Pokemon objects
+ */
+function saveTeam(team) {
+    try {
+        localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(team));
+    } catch (error) {
+        console.error('Error saving team:', error);
+    }
+}
+
+/**
+ * Loads the player's team from localStorage.
+ * @returns {Object[]|null} Team array or null if not found
+ */
+function loadTeam() {
+    try {
+        const stored = localStorage.getItem(TEAM_STORAGE_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error('Error loading team:', error);
+    }
+    return null;
+}
+
+/**
+ * Clears the saved team from localStorage.
+ */
+function clearTeam() {
+    localStorage.removeItem(TEAM_STORAGE_KEY);
+}
+
+/**
+ * Updates a single Pokemon in the saved team.
+ * @param {number} index - Index of Pokemon to update
+ * @param {Object} pokemon - Updated Pokemon object
+ */
+function updateTeamPokemon(index, pokemon) {
+    const team = loadTeam();
+    if (team && index >= 0 && index < team.length) {
+        team[index] = pokemon;
+        saveTeam(team);
+    }
+}
+
+/**
+ * Revives a fainted Pokemon (restores HP to max).
+ * @param {number} index - Index of Pokemon to revive
+ * @returns {Object|null} Revived Pokemon or null if failed
+ */
+function revivePokemon(index) {
+    const team = loadTeam();
+    if (team && index >= 0 && index < team.length) {
+        const pokemon = team[index];
+        if (pokemon.hp <= 0) {
+            pokemon.hp = pokemon.maxHp;
+            team[index] = pokemon;
+            saveTeam(team);
+            return pokemon;
+        }
+    }
+    return null;
+}
+
+/**
+ * Heals all Pokemon in the team to full HP.
+ */
+function healAllPokemon() {
+    const team = loadTeam();
+    if (team) {
+        team.forEach(pokemon => {
+            pokemon.hp = pokemon.maxHp;
+        });
+        saveTeam(team);
+    }
 }
 
 // ==========================================
@@ -185,6 +334,15 @@ function renderAvatarGrid(containerId, onSelect) {
     });
 }
 
+/**
+ * Formats a number with commas for display.
+ * @param {number} num - Number to format
+ * @returns {string} Formatted number
+ */
+function formatNumber(num) {
+    return num.toLocaleString();
+}
+
 // ==========================================
 // Export for module usage (if needed later)
 // ==========================================
@@ -192,13 +350,25 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         AVATAR_OPTIONS,
         DEFAULT_PROFILE,
+        COSTS,
+        REWARDS,
         getUserProfile,
         saveUserProfile,
         updateUserProfile,
         resetUserStats,
         recordBattleResult,
+        getCoins,
+        addCoins,
+        spendCoins,
+        canAfford,
+        saveTeam,
+        loadTeam,
+        clearTeam,
+        updateTeamPokemon,
+        revivePokemon,
+        healAllPokemon,
         renderUserBadge,
-        renderAvatarGrid
+        renderAvatarGrid,
+        formatNumber
     };
 }
-

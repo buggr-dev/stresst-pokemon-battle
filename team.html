@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - Pokemon Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/shared.css">
+    <link rel="stylesheet" href="styles/team.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="page-header">
+            <h1 class="page-title">Team</h1>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-link">Battle</a>
+                <a href="team.html" class="nav-link active">Team</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </nav>
+            <div class="coins-display" id="coins-display">
+                <span class="coins-icon">🪙</span>
+                <span class="coins-amount" id="coins-amount">0</span>
+            </div>
+        </header>
+
+        <!-- Info Card -->
+        <div class="info-card">
+            <span class="info-icon">💡</span>
+            <p class="info-text">
+                Manage your Pokemon team here. Revive fainted Pokemon or replace them with new random ones. 
+                Earn coins by winning battles!
+            </p>
+        </div>
+
+        <!-- Team Section -->
+        <section class="card">
+            <div class="team-header">
+                <h2 class="card-title">Your Pokemon</h2>
+                <div class="team-actions">
+                    <button class="btn btn-heal-all btn-small" id="heal-all-btn">
+                        Heal All
+                        <span class="cost" id="heal-all-cost">75</span>
+                    </button>
+                </div>
+            </div>
+            <div class="team-management-grid" id="team-grid">
+                <!-- Pokemon cards rendered by JS -->
+            </div>
+        </section>
+
+        <!-- Price List -->
+        <section class="card">
+            <h2 class="card-title">Shop Prices</h2>
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; background: var(--bg-card); border-radius: 12px;">
+                    <span style="font-size: 2rem;">💚</span>
+                    <span class="stat-item-label">Revive</span>
+                    <span class="stat-item-value">🪙 50</span>
+                </div>
+                <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; background: var(--bg-card); border-radius: 12px;">
+                    <span style="font-size: 2rem;">🎲</span>
+                    <span class="stat-item-label">New Pokemon</span>
+                    <span class="stat-item-value">🪙 100</span>
+                </div>
+                <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; background: var(--bg-card); border-radius: 12px;">
+                    <span style="font-size: 2rem;">✨</span>
+                    <span class="stat-item-label">Heal All</span>
+                    <span class="stat-item-value">🪙 75</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast for notifications -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/shared.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/team.js"></script>
+</body>
+</html>
+

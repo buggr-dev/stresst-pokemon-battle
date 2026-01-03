@@ -1,0 +1,443 @@
+/* ==========================================
+   Team Page Specific Styles
+   ========================================== */
+
+/* ==========================================
+   Coins Display
+   ========================================== */
+.coins-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(135deg, var(--accent-gold) 0%, #ffdf4d 100%);
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
+}
+
+.coins-icon {
+    font-size: 1.25rem;
+}
+
+.coins-amount {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    color: var(--bg-primary);
+    font-weight: 700;
+}
+
+/* ==========================================
+   Team Header
+   ========================================== */
+.team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.team-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* ==========================================
+   Team Grid
+   ========================================== */
+.team-management-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+}
+
+/* ==========================================
+   Team Pokemon Card
+   ========================================== */
+.team-pokemon-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border-subtle);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.team-pokemon-card:hover {
+    border-color: var(--accent-purple);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.team-pokemon-card.fainted {
+    border-color: var(--accent-red);
+}
+
+.team-pokemon-card.fainted .card-header {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 107, 107, 0.1) 100%);
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(135deg, rgba(151, 117, 250, 0.2) 0%, rgba(51, 154, 240, 0.1) 100%);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.pokemon-id {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.pokemon-types {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.type-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: white;
+}
+
+/* Type colors */
+.type-badge.normal { background: #A8A878; }
+.type-badge.fire { background: #F08030; }
+.type-badge.water { background: #6890F0; }
+.type-badge.electric { background: #F8D030; color: #333; }
+.type-badge.grass { background: #78C850; }
+.type-badge.ice { background: #98D8D8; color: #333; }
+.type-badge.fighting { background: #C03028; }
+.type-badge.poison { background: #A040A0; }
+.type-badge.ground { background: #E0C068; color: #333; }
+.type-badge.flying { background: #A890F0; }
+.type-badge.psychic { background: #F85888; }
+.type-badge.bug { background: #A8B820; }
+.type-badge.rock { background: #B8A038; }
+.type-badge.ghost { background: #705898; }
+.type-badge.dragon { background: #7038F8; }
+.type-badge.dark { background: #705848; }
+.type-badge.steel { background: #B8B8D0; color: #333; }
+.type-badge.fairy { background: #EE99AC; color: #333; }
+
+/* Card Body */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+}
+
+.team-sprite {
+    width: 96px;
+    height: 96px;
+    image-rendering: pixelated;
+}
+
+.team-sprite.fainted {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+.team-pokemon-name {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    text-transform: uppercase;
+}
+
+/* HP Section */
+.hp-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.hp-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.team-health-bar {
+    height: 10px;
+    background: var(--bg-primary);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.team-health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--health-full), #73d87e);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.team-health-fill.health-mid {
+    background: linear-gradient(90deg, var(--health-mid), #fdd835);
+}
+
+.team-health-fill.health-low {
+    background: linear-gradient(90deg, var(--health-low), #ff8a80);
+}
+
+/* Stats Section */
+.stats-section {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    width: 100%;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.stat-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.stat-mini-value {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    color: var(--accent-gold);
+}
+
+.stat-mini-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* Card Footer / Actions */
+.card-footer {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.card-footer .btn {
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.75rem;
+}
+
+/* Status Badge */
+.status-badge {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-badge.fainted {
+    background: var(--accent-red);
+    color: white;
+}
+
+.status-badge.healthy {
+    background: var(--accent-green);
+    color: white;
+}
+
+/* ==========================================
+   Action Buttons
+   ========================================== */
+.btn-revive {
+    background: linear-gradient(135deg, var(--accent-green) 0%, #73d87e 100%);
+    color: white;
+    box-shadow: 0 2px 10px rgba(81, 207, 102, 0.3);
+}
+
+.btn-revive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(81, 207, 102, 0.5);
+}
+
+.btn-replace {
+    background: linear-gradient(135deg, var(--accent-purple) 0%, #b794f6 100%);
+    color: white;
+    box-shadow: 0 2px 10px rgba(151, 117, 250, 0.3);
+}
+
+.btn-replace:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(151, 117, 250, 0.5);
+}
+
+.btn-heal-all {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, #74c0fc 100%);
+    color: white;
+}
+
+.btn-small {
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
+    font-size: 0.7rem !important;
+}
+
+/* Cost display in buttons */
+.btn .cost {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+
+.btn .cost::before {
+    content: '🪙';
+}
+
+/* ==========================================
+   Empty Slot
+   ========================================== */
+.team-pokemon-card.empty {
+    border-style: dashed;
+    opacity: 0.7;
+}
+
+.empty-slot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    gap: var(--spacing-md);
+    min-height: 200px;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    opacity: 0.5;
+}
+
+.empty-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* ==========================================
+   Info Card
+   ========================================== */
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(51, 154, 240, 0.1);
+    border: 1px solid rgba(51, 154, 240, 0.3);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-icon {
+    font-size: 1.5rem;
+}
+
+.info-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* ==========================================
+   Toast Messages
+   ========================================== */
+.toast {
+    position: fixed;
+    bottom: var(--spacing-xl);
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast.success {
+    border-left: 4px solid var(--accent-green);
+}
+
+.toast.error {
+    border-left: 4px solid var(--accent-red);
+}
+
+.toast.info {
+    border-left: 4px solid var(--accent-blue);
+}
+
+/* ==========================================
+   Loading Overlay
+   ========================================== */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 15, 35, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    z-index: 10;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-subtle);
+    border-top-color: var(--accent-gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   Responsive Design
+   ========================================== */
+@media (max-width: 768px) {
+    .team-management-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .team-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .team-actions {
+        justify-content: center;
+    }
+
+    .card-footer {
+        flex-direction: column;
+    }
+}
+

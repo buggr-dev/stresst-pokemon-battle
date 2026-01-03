@@ -175,28 +175,53 @@ async function initBattle() {
 
 /**
  * Loads Pokemon from the API for player team and enemy.
+ * Uses saved team if available, otherwise fetches new team.
  */
 async function loadPokemon() {
     try {
-        // Fetch player team and enemy in parallel
-        const [team, enemy] = await Promise.all([
-            fetchRandomTeam(3),
-            fetchRandomPokemon()
-        ]);
+        // Check for existing saved team
+        const savedTeam = loadTeam();
+        let team;
+        let isNewTeam = false;
+        
+        if (savedTeam && savedTeam.length === 3) {
+            // Use saved team
+            team = savedTeam;
+            showBattleMessage('Loading your team...');
+        } else {
+            // Fetch new team
+            isNewTeam = true;
+            team = await fetchRandomTeam(3);
+            // Save the new team
+            saveTeam(team);
+        }
+        
+        // Always fetch a new enemy
+        const enemy = await fetchRandomPokemon();
         
         // Update game state
         gameState.playerTeam = team;
         gameState.enemyPokemon = enemy;
         gameState.isLoading = false;
         
+        // Find first non-fainted Pokemon to be active
+        const activeIndex = team.findIndex(p => p.hp > 0);
+        gameState.activePlayerPokemon = activeIndex >= 0 ? activeIndex : 0;
+        
         // Re-render with real Pokemon
         renderBattle();
         setButtonsEnabled(true);
         
-        const teamNames = team.map(p => p.name).join(', ');
-        showBattleMessage(`Your team: ${teamNames}! Battle against ${enemy.name}!`);
+        // Show appropriate message
+        if (isNewTeam) {
+            const teamNames = team.map(p => p.name).join(', ');
+            showBattleMessage(`Your new team: ${teamNames}! Battle against ${enemy.name}!`);
+        } else {
+            const activePokemon = team[gameState.activePlayerPokemon];
+            showBattleMessage(`Go, ${activePokemon.name}! A wild ${enemy.name} appeared!`);
+        }
         
-        console.log('Pokemon loaded:', { team, enemy });
+        console.log('Pokemon loaded:', { team, enemy, isNewTeam });
     } catch (error) {
         console.error('Failed to load Pokemon:', error);
         showBattleMessage('Failed to load Pokemon. Please refresh the page.');
