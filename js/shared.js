@@ -32,6 +32,7 @@ const DEFAULT_PROFILE = {
 /** localStorage keys */
 const STORAGE_KEY = 'pokemonBattleUser';
 const TEAM_STORAGE_KEY = 'pokemonBattleTeam';
+const BATTLE_PROGRESS_KEY = 'pokemonBattleProgress';
 
 /** Coin costs for actions */
 const COSTS = {
@@ -277,6 +278,45 @@ function healAllPokemon() {
 }
 
 // ==========================================
+// Battle Progress Management
+// ==========================================
+
+/**
+ * Saves battle progress to localStorage.
+ * @param {Object} progress - Progress object with round and wins
+ */
+function saveBattleProgress(progress) {
+    try {
+        localStorage.setItem(BATTLE_PROGRESS_KEY, JSON.stringify(progress));
+    } catch (error) {
+        console.error('Error saving battle progress:', error);
+    }
+}
+
+/**
+ * Loads battle progress from localStorage.
+ * @returns {Object} Progress object with round and wins, or defaults
+ */
+function loadBattleProgress() {
+    try {
+        const stored = localStorage.getItem(BATTLE_PROGRESS_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error('Error loading battle progress:', error);
+    }
+    return { round: 1, wins: 0 };
+}
+
+/**
+ * Resets battle progress to initial values.
+ */
+function resetBattleProgress() {
+    saveBattleProgress({ round: 1, wins: 0 });
+}
+
+// ==========================================
 // UI Helpers
 // ==========================================
 
@@ -380,6 +420,9 @@ if (typeof module !== 'undefined' && module.exports) {
         updateTeamPokemon,
         revivePokemon,
         healAllPokemon,
+        saveBattleProgress,
+        loadBattleProgress,
+        resetBattleProgress,
         renderUserBadge,
         renderAvatarGrid,
         formatNumber,

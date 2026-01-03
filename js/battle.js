@@ -120,6 +120,9 @@ async function handleBattleWin() {
     gameState.wins++;
     gameState.round++;
     
+    // Save battle progress
+    saveBattleProgress({ round: gameState.round, wins: gameState.wins });
+    
     // Record win and add coins
     recordBattleResult(true);
     addCoins(REWARDS.DEFEAT_POKEMON);
@@ -173,6 +176,10 @@ async function handlePokemonFainted() {
         recordBattleResult(false);
         showBattleMessage(`All your Pokemon have fainted! Your streak of ${gameState.wins} wins has ended.`);
         gameState.wins = 0;
+        gameState.round = 1;
+        
+        // Reset battle progress
+        resetBattleProgress();
         updateBattleUI();
         
         await delay(2000);
@@ -483,8 +490,10 @@ function loadUserData() {
         `;
     }
     
-    // Load current streak as wins
-    gameState.wins = profile.stats.currentStreak;
+    // Load battle progress (round and wins)
+    const progress = loadBattleProgress();
+    gameState.round = progress.round;
+    gameState.wins = progress.wins;
 }
 
 // ==========================================
