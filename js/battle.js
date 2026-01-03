@@ -11,6 +11,7 @@
 const gameState = {
     round: 1,
     wins: 0,
+    isLoading: true,
     playerTeam: [
         { id: 1, name: '???', hp: 100, maxHp: 100, sprite: null },
         { id: 2, name: '???', hp: 100, maxHp: 100, sprite: null },
@@ -48,12 +49,24 @@ const battleElements = {
  */
 function createPokemonCard(pokemon, slot, isActive) {
     const hpPercent = (pokemon.hp / pokemon.maxHp) * 100;
+    const isFainted = pokemon.hp <= 0;
     const spriteContent = pokemon.sprite 
-        ? `<img src="${pokemon.sprite}" alt="${pokemon.name}" class="card-sprite-img">`
+        ? `<img src="${pokemon.sprite}" alt="${pokemon.name}" class="card-sprite-img ${isFainted ? 'fainted' : ''}">`
         : '<div class="sprite-placeholder small">?</div>';
     
+    let status = 'Ready';
+    let statusClass = '';
+    
+    if (isFainted) {
+        status = 'Fainted';
+        statusClass = 'fainted';
+    } else if (isActive) {
+        status = 'Active';
+        statusClass = 'active';
+    }
+    
     return `
-        <div class="pokemon-card ${isActive ? 'active' : ''}" data-slot="${slot}">
+        <div class="pokemon-card ${isActive ? 'active' : ''} ${isFainted ? 'fainted' : ''}" data-slot="${slot}">
             <div class="card-sprite">
                 ${spriteContent}
             </div>
@@ -63,7 +76,7 @@ function createPokemonCard(pokemon, slot, isActive) {
                     <div class="health-fill" style="width: ${hpPercent}%"></div>
                 </div>
             </div>
-            <div class="card-status ${isActive ? 'active' : ''}">${isActive ? 'Active' : 'Ready'}</div>
+            <div class="card-status ${statusClass}">${status}</div>
         </div>
     `;
 }
@@ -80,11 +93,19 @@ function createBattlePokemonCard(pokemon, isEnemy = false) {
         ? `<img src="${pokemon.sprite}" alt="${pokemon.name}" class="battle-sprite-img">`
         : '<div class="sprite-placeholder">?</div>';
     
+    // Determine health bar color class based on HP percentage
+    let healthClass = '';
+    if (hpPercent <= 25) {
+        healthClass = 'health-low';
+    } else if (hpPercent <= 50) {
+        healthClass = 'health-mid';
+    }
+    
     const infoSection = `
         <div class="pokemon-info">
             <span class="pokemon-name">${pokemon.name}</span>
             <div class="health-bar">
-                <div class="health-fill" style="width: ${hpPercent}%"></div>
+                <div class="health-fill ${healthClass}" style="width: ${hpPercent}%"></div>
             </div>
             <span class="health-text">${pokemon.hp} / ${pokemon.maxHp}</span>
         </div>
@@ -108,6 +129,27 @@ function createBattlePokemonCard(pokemon, isEnemy = false) {
     `;
 }
 
+/**
+ * Creates HTML for a loading placeholder card.
+ * @returns {string} HTML string for loading card
+ */
+function createLoadingCard() {
+    return `
+        <div class="pokemon-card loading">
+            <div class="card-sprite">
+                <div class="sprite-placeholder small loading-pulse">...</div>
+            </div>
+            <div class="card-info">
+                <span class="card-name">Loading...</span>
+                <div class="mini-health-bar">
+                    <div class="health-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="card-status">Please wait</div>
+        </div>
+    `;
+}
+
 // ==========================================
 // Initialization
 // ==========================================
@@ -115,14 +157,52 @@ function createBattlePokemonCard(pokemon, isEnemy = false) {
 /**
  * Initializes the battle page.
  */
-function initBattle() {
+async function initBattle() {
     cacheBattleElements();
     loadUserData();
-    renderBattle();
     setupBattleEventListeners();
-    updateBattleUI();
     
+    // Show loading state
+    renderBattle();
+    showBattleMessage('Assembling your team...');
+    setButtonsEnabled(false);
+    
+    // Fetch Pokemon from API
+    await loadPokemon();
+    
+    updateBattleUI();
     console.log('Pokemon Battle game initialized!');
+}
+
+/**
+ * Loads Pokemon from the API for player team and enemy.
+ */
+async function loadPokemon() {
+    try {
+        // Fetch player team and enemy in parallel
+        const [team, enemy] = await Promise.all([
+            fetchRandomTeam(3),
+            fetchRandomPokemon()
+        ]);
+        
+        // Update game state
+        gameState.playerTeam = team;
+        gameState.enemyPokemon = enemy;
+        gameState.isLoading = false;
+        
+        // Re-render with real Pokemon
+        renderBattle();
+        setButtonsEnabled(true);
+        
+        const teamNames = team.map(p => p.name).join(', ');
+        showBattleMessage(`Your team: ${teamNames}! Battle against ${enemy.name}!`);
+        
+        console.log('Pokemon loaded:', { team, enemy });
+    } catch (error) {
+        console.error('Failed to load Pokemon:', error);
+        showBattleMessage('Failed to load Pokemon. Please refresh the page.');
+        gameState.isLoading = false;
+    }
 }
 
 /**
@@ -153,7 +233,7 @@ function setupBattleEventListeners() {
     // Team Pokemon cards (using event delegation)
     battleElements.playerTeam.addEventListener('click', (e) => {
         const card = e.target.closest('.pokemon-card');
-        if (card) {
+        if (card && !gameState.isLoading) {
             const slot = parseInt(card.dataset.slot, 10);
             handlePokemonSelect(slot);
         }
@@ -187,6 +267,8 @@ function loadUserData() {
  * TODO: Implement actual battle logic with damage calculation
  */
 function handleAttack() {
+    if (gameState.isLoading) return;
+    
     showBattleMessage('Attack! (Battle logic coming soon...)');
     console.log('Attack button clicked');
 }
@@ -196,6 +278,8 @@ function handleAttack() {
  * TODO: Implement switch logic
  */
 function handleSwitch() {
+    if (gameState.isLoading) return;
+    
     showBattleMessage('Click on a Pokemon in your team to switch!');
     console.log('Switch button clicked');
 }
@@ -205,20 +289,28 @@ function handleSwitch() {
  * @param {number} slot - The slot index of the selected Pokemon (0-2)
  */
 function handlePokemonSelect(slot) {
+    const pokemon = gameState.playerTeam[slot];
+    
+    // Can't select fainted Pokemon
+    if (pokemon.hp <= 0) {
+        showBattleMessage(`${pokemon.name} has fainted and can't battle!`);
+        return;
+    }
+    
     if (slot === gameState.activePlayerPokemon) {
-        showBattleMessage('This Pokemon is already in battle!');
+        showBattleMessage(`${pokemon.name} is already in battle!`);
         return;
     }
     
     // Update active Pokemon
-    const previousActive = gameState.activePlayerPokemon;
+    const previousPokemon = gameState.playerTeam[gameState.activePlayerPokemon];
     gameState.activePlayerPokemon = slot;
     
     // Re-render battle to update active Pokemon in arena and team
     renderBattle();
     
-    showBattleMessage(`Switched to Pokemon ${slot + 1}!`);
-    console.log(`Switched from slot ${previousActive} to slot ${slot}`);
+    showBattleMessage(`Go, ${pokemon.name}! ${previousPokemon.name}, come back!`);
+    console.log(`Switched from ${previousPokemon.name} to ${pokemon.name}`);
 }
 
 // ==========================================
@@ -250,6 +342,13 @@ function renderBattleArena() {
  * Renders the player's team using the component function.
  */
 function renderTeam() {
+    if (gameState.isLoading) {
+        // Show loading cards
+        battleElements.playerTeam.innerHTML = 
+            createLoadingCard() + createLoadingCard() + createLoadingCard();
+        return;
+    }
+    
     const teamHTML = gameState.playerTeam
         .map((pokemon, index) => createPokemonCard(
             pokemon, 
@@ -279,6 +378,23 @@ function updateBattleUI() {
  */
 function showBattleMessage(message) {
     battleElements.battleMessage.textContent = message;
+}
+
+/**
+ * Enables or disables the action buttons.
+ * @param {boolean} enabled - Whether buttons should be enabled
+ */
+function setButtonsEnabled(enabled) {
+    battleElements.attackBtn.disabled = !enabled;
+    battleElements.switchBtn.disabled = !enabled;
+    
+    if (enabled) {
+        battleElements.attackBtn.classList.remove('disabled');
+        battleElements.switchBtn.classList.remove('disabled');
+    } else {
+        battleElements.attackBtn.classList.add('disabled');
+        battleElements.switchBtn.classList.add('disabled');
+    }
 }
 
 // ==========================================
