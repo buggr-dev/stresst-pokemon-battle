@@ -221,6 +221,40 @@
     text-transform: uppercase;
 }
 
+/* Strength Badge */
+.strength-badge {
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.7rem !important;
+}
+
+.strength-s {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #1a1a2e;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.strength-a {
+    background: linear-gradient(135deg, #9775fa 0%, #845ef7 100%);
+    color: white;
+}
+
+.strength-b {
+    background: linear-gradient(135deg, #339af0 0%, #228be6 100%);
+    color: white;
+}
+
+.strength-c {
+    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    color: white;
+}
+
+.strength-d {
+    background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);
+    color: white;
+}
+
 /* Card Footer / Actions */
 .card-footer {
     display: flex;

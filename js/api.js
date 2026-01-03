@@ -93,6 +93,11 @@ function formatPokemonData(apiData) {
     // Get Pokemon types
     const types = apiData.types.map(t => t.type.name);
     
+    // Get base experience and calculate strength score (1-100 scale)
+    // base_experience typically ranges from ~36 to ~608
+    const baseExperience = apiData.base_experience || 100;
+    const strength = Math.min(100, Math.max(1, Math.round((baseExperience / 608) * 100)));
+    
     return {
         id: apiData.id,
         name: capitalizeFirst(apiData.name),
@@ -101,7 +106,9 @@ function formatPokemonData(apiData) {
         attack: baseAttack,
         types: types,
         sprite: apiData.sprites.front_default,
-        spriteBack: apiData.sprites.back_default
+        spriteBack: apiData.sprites.back_default,
+        baseExperience: baseExperience,
+        strength: strength
     };
 }
 

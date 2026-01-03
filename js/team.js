@@ -224,6 +224,19 @@ function renderEmptyTeam() {
 }
 
 /**
+ * Gets the strength tier based on strength score.
+ * @param {number} strength - Strength score (1-100)
+ * @returns {Object} Object with tier name and CSS class
+ */
+function getStrengthTier(strength) {
+    if (strength >= 80) return { name: 'S', class: 'strength-s' };
+    if (strength >= 60) return { name: 'A', class: 'strength-a' };
+    if (strength >= 40) return { name: 'B', class: 'strength-b' };
+    if (strength >= 20) return { name: 'C', class: 'strength-c' };
+    return { name: 'D', class: 'strength-d' };
+}
+
+/**
  * Creates HTML for a team Pokemon card.
  * @param {Object} pokemon - Pokemon data
  * @param {number} index - Array index
@@ -241,6 +254,10 @@ function createTeamCard(pokemon, index) {
     const typeBadges = types.map(type => 
         `<span class="type-badge ${type}">${type}</span>`
     ).join('');
+    
+    // Get strength score and tier
+    const strength = pokemon.strength || 50;
+    const tier = getStrengthTier(strength);
     
     return `
         <div class="team-pokemon-card ${isFainted ? 'fainted' : ''}" data-index="${index}">
@@ -275,6 +292,10 @@ function createTeamCard(pokemon, index) {
                     <div class="stat-mini">
                         <span class="stat-mini-value">${pokemon.maxHp}</span>
                         <span class="stat-mini-label">HP</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-mini-value strength-badge ${tier.class}">${tier.name}</span>
+                        <span class="stat-mini-label">STR</span>
                     </div>
                 </div>
             </div>
