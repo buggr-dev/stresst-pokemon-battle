@@ -559,6 +559,38 @@
 }
 
 /* ==========================================
+   Matchup Legend
+   ========================================== */
+.matchup-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
+}
+
+.legend-title {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.legend-icon {
+    font-size: 1rem;
+}
+
+/* ==========================================
    Reset Section
    ========================================== */
 .reset-section {
