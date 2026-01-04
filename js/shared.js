@@ -472,3 +472,5 @@ if (typeof module !== 'undefined' && module.exports) {
         getStrengthTier
     };
 }
+
+// Add to stresst

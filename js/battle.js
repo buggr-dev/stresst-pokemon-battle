@@ -764,3 +764,5 @@ function setButtonsEnabled(enabled) {
 // Start when DOM is ready
 // ==========================================
 document.addEventListener('DOMContentLoaded', initBattle);
+
+// Add to stresst
