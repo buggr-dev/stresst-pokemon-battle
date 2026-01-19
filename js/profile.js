@@ -174,4 +174,4 @@ function showSaveMessage(message = 'Profile saved successfully!') {
 // ==========================================
 document.addEventListener('DOMContentLoaded', initProfile);
 
-// Add to stresst
+// Add to buggr

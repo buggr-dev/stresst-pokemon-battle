@@ -273,4 +273,4 @@ function showToast(message, type = 'info') {
 // ==========================================
 document.addEventListener('DOMContentLoaded', initTeam);
 
-// Add to stresst
+// Add to buggr

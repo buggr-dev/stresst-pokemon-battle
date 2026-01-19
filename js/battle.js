@@ -557,4 +557,4 @@ function setButtonsEnabled(enabled) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', initBattle);
 
-// Add to stresst
+// Add to buggr
