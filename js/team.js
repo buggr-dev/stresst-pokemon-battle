@@ -113,11 +113,14 @@ function handleRevive(index) {
         return;
     }
     
-    // Spend coins and revive
+    // Spend coins and revive using shared function
     spendCoins(COSTS.REVIVE);
-    pokemon.hp = pokemon.maxHp;
-    currentTeam[index] = pokemon;
-    saveTeam(currentTeam);
+    const revivedPokemon = revivePokemon(index);
+    
+    // Sync local state
+    if (revivedPokemon) {
+        currentTeam[index] = revivedPokemon;
+    }
     
     // Update UI
     updateCoinsDisplay();
@@ -182,12 +185,12 @@ function handleHealAll() {
         return;
     }
     
-    // Spend coins and heal
+    // Spend coins and heal using shared function
     spendCoins(COSTS.HEAL_ALL);
-    currentTeam.forEach(pokemon => {
-        pokemon.hp = pokemon.maxHp;
-    });
-    saveTeam(currentTeam);
+    healAllPokemon();
+    
+    // Sync local state by reloading from storage
+    currentTeam = loadTeam();
     
     // Update UI
     updateCoinsDisplay();
@@ -200,105 +203,19 @@ function handleHealAll() {
 // ==========================================
 
 /**
- * Renders the team grid.
+ * Renders the team grid using template functions.
  */
 function renderTeam() {
     teamElements.teamGrid.innerHTML = currentTeam
-        .map((pokemon, index) => createTeamCard(pokemon, index))
+        .map((pokemon, index) => createTeamCardTemplate(pokemon, index, COSTS))
         .join('');
 }
 
 /**
- * Renders empty team state.
+ * Renders empty team state using template function.
  */
 function renderEmptyTeam() {
-    teamElements.teamGrid.innerHTML = `
-        <div class="team-pokemon-card empty" style="grid-column: 1 / -1;">
-            <div class="empty-slot-content">
-                <span class="empty-icon">🎮</span>
-                <p class="empty-text">No team yet! Start a battle to get your Pokemon.</p>
-                <a href="index.html" class="btn btn-primary">Go to Battle</a>
-            </div>
-        </div>
-    `;
-}
-
-/**
- * Creates HTML for a team Pokemon card.
- * @param {Object} pokemon - Pokemon data
- * @param {number} index - Array index
- * @returns {string} HTML string
- */
-function createTeamCard(pokemon, index) {
-    const hpPercent = (pokemon.hp / pokemon.maxHp) * 100;
-    const isFainted = pokemon.hp <= 0;
-    
-    let healthClass = '';
-    if (hpPercent <= 25) healthClass = 'health-low';
-    else if (hpPercent <= 50) healthClass = 'health-mid';
-    
-    const types = pokemon.types || [];
-    const typeBadges = types.map(type => 
-        `<span class="type-badge ${type}">${type}</span>`
-    ).join('');
-    
-    // Get strength score and tier
-    const strength = pokemon.strength || 50;
-    const tier = getStrengthTier(strength);
-    
-    return `
-        <div class="team-pokemon-card ${isFainted ? 'fainted' : ''}" data-index="${index}">
-            <div class="card-header">
-                <span class="pokemon-id">#${String(pokemon.id).padStart(3, '0')}</span>
-                <div class="pokemon-types">${typeBadges}</div>
-            </div>
-            
-            <div class="card-body">
-                <img 
-                    src="${pokemon.sprite}" 
-                    alt="${pokemon.name}" 
-                    class="team-sprite ${isFainted ? 'fainted' : ''}"
-                >
-                <span class="team-pokemon-name">${pokemon.name}</span>
-                
-                <div class="hp-section">
-                    <div class="hp-label">
-                        <span>HP</span>
-                        <span>${pokemon.hp} / ${pokemon.maxHp}</span>
-                    </div>
-                    <div class="team-health-bar">
-                        <div class="team-health-fill ${healthClass}" style="width: ${hpPercent}%"></div>
-                    </div>
-                </div>
-                
-                <div class="stats-section">
-                    <div class="stat-mini">
-                        <span class="stat-mini-value">${pokemon.attack || '?'}</span>
-                        <span class="stat-mini-label">ATK</span>
-                    </div>
-                    <div class="stat-mini">
-                        <span class="stat-mini-value">${pokemon.maxHp}</span>
-                        <span class="stat-mini-label">HP</span>
-                    </div>
-                    <div class="stat-mini">
-                        <span class="stat-mini-value strength-badge ${tier.class}">${tier.name}</span>
-                        <span class="stat-mini-label">STR</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card-footer">
-                ${isFainted ? `
-                    <button class="btn btn-revive">
-                        Revive <span class="cost">${COSTS.REVIVE}</span>
-                    </button>
-                ` : ''}
-                <button class="btn btn-replace">
-                    Replace <span class="cost">${COSTS.NEW_POKEMON}</span>
-                </button>
-            </div>
-        </div>
-    `;
+    teamElements.teamGrid.innerHTML = createEmptyTeamTemplate();
 }
 
 /**

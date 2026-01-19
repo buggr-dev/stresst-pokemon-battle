@@ -197,41 +197,6 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Gets type effectiveness indicator HTML for a Pokemon against the enemy.
- * @param {Object} pokemon - The player's Pokemon
- * @param {Object} enemy - The enemy Pokemon
- * @returns {string} HTML string for the indicator (or empty string if neutral)
- */
-function getEffectivenessIndicator(pokemon, enemy) {
-    if (!pokemon || !enemy) return '';
-    
-    const playerTypes = pokemon.types || ['normal'];
-    const enemyTypes = enemy.types || ['normal'];
-    
-    // Check player's effectiveness against enemy
-    const playerVsEnemy = getTypeEffectiveness(playerTypes, enemyTypes);
-    // Check enemy's effectiveness against player
-    const enemyVsPlayer = getTypeEffectiveness(enemyTypes, playerTypes);
-    
-    // Determine overall matchup
-    if (playerVsEnemy >= 2 && enemyVsPlayer < 2) {
-        // Strong advantage
-        return '<span class="matchup-indicator matchup-advantage" title="Super effective!">⚔️</span>';
-    } else if (playerVsEnemy >= 2 && enemyVsPlayer >= 2) {
-        // Both super effective
-        return '<span class="matchup-indicator matchup-neutral" title="Both super effective">⚡</span>';
-    } else if (playerVsEnemy < 1 || enemyVsPlayer >= 2) {
-        // Disadvantage
-        return '<span class="matchup-indicator matchup-disadvantage" title="Not very effective...">🛡️</span>';
-    } else if (playerVsEnemy >= 1.5) {
-        // Slight advantage
-        return '<span class="matchup-indicator matchup-advantage" title="Effective">⚔️</span>';
-    }
-    
-    return '';
-}
-
 // ==========================================
 // DOM Elements
 // ==========================================
@@ -246,173 +211,6 @@ const battleElements = {
     resetBtn: null,
     userBadge: null
 };
-
-// ==========================================
-// Components
-// ==========================================
-
-/**
- * Creates HTML for a Pokemon team card.
- * @param {Object} pokemon - Pokemon data object
- * @param {number} slot - Team slot index (0-2)
- * @param {boolean} isActive - Whether this Pokemon is currently active
- * @returns {string} HTML string for the card
- */
-function createPokemonCard(pokemon, slot, isActive) {
-    const hpPercent = (pokemon.hp / pokemon.maxHp) * 100;
-    const isFainted = pokemon.hp <= 0;
-    const spriteContent = pokemon.sprite 
-        ? `<img src="${pokemon.sprite}" alt="${pokemon.name}" class="card-sprite-img ${isFainted ? 'fainted' : ''}">`
-        : '<div class="sprite-placeholder small">?</div>';
-    
-    let status = 'Ready';
-    let statusClass = '';
-    
-    if (isFainted) {
-        status = 'Fainted';
-        statusClass = 'fainted';
-    } else if (isActive) {
-        status = 'Active';
-        statusClass = 'active';
-    }
-    
-    // Get strength tier
-    const strength = pokemon.strength || 50;
-    const tier = getStrengthTier(strength);
-    
-    // Get types
-    const types = pokemon.types || [];
-    const typeBadges = types.map(type => 
-        `<span class="type-badge ${type}">${type}</span>`
-    ).join('');
-    
-    // Get matchup indicator against current enemy
-    const matchupIndicator = getEffectivenessIndicator(pokemon, gameState.enemyPokemon);
-    
-    return `
-        <div class="pokemon-card ${isActive ? 'active' : ''} ${isFainted ? 'fainted' : ''}" data-slot="${slot}">
-            ${matchupIndicator}
-            <div class="card-sprite">
-                ${spriteContent}
-            </div>
-            <div class="card-info">
-                <span class="card-name">${pokemon.name}</span>
-                <div class="card-types">${typeBadges}</div>
-                <div class="mini-health-bar">
-                    <div class="health-fill" style="width: ${hpPercent}%"></div>
-                </div>
-                <div class="card-stats">
-                    <span class="card-stat"><span class="card-stat-value">${pokemon.attack || '?'}</span> ATK</span>
-                    <span class="card-stat"><span class="card-stat-value">${pokemon.maxHp}</span> HP</span>
-                    <span class="card-stat"><span class="strength-badge ${tier.class}">${tier.name}</span> STR</span>
-                </div>
-            </div>
-            <div class="card-status ${statusClass}">${status}</div>
-        </div>
-    `;
-}
-
-/**
- * Creates HTML for the battle Pokemon display (player or enemy side).
- * @param {Object} pokemon - Pokemon data object
- * @param {boolean} isEnemy - Whether this is the enemy Pokemon
- * @returns {string} HTML string for the battle card
- */
-function createBattlePokemonCard(pokemon, isEnemy = false) {
-    const hpPercent = (pokemon.hp / pokemon.maxHp) * 100;
-    const spriteContent = pokemon.sprite 
-        ? `<img src="${pokemon.sprite}" alt="${pokemon.name}" class="battle-sprite-img">`
-        : '<div class="sprite-placeholder">?</div>';
-    
-    // Determine health bar color class based on HP percentage
-    let healthClass = '';
-    if (hpPercent <= 25) {
-        healthClass = 'health-low';
-    } else if (hpPercent <= 50) {
-        healthClass = 'health-mid';
-    }
-    
-    // Get strength tier
-    const strength = pokemon.strength || 50;
-    const tier = getStrengthTier(strength);
-    
-    // Get types
-    const types = pokemon.types || [];
-    const typeBadges = types.map(type => 
-        `<span class="type-badge ${type}">${type}</span>`
-    ).join('');
-    
-    // Get matchup indicator (only for player's Pokemon)
-    const matchupIndicator = !isEnemy 
-        ? getEffectivenessIndicator(pokemon, gameState.enemyPokemon)
-        : '';
-    
-    const infoSection = `
-        <div class="pokemon-info">
-            <div class="pokemon-name-row">
-                <span class="pokemon-name">${pokemon.name}</span>
-                ${matchupIndicator}
-            </div>
-            <div class="battle-types">${typeBadges}</div>
-            <div class="health-bar">
-                <div class="health-fill ${healthClass}" style="width: ${hpPercent}%"></div>
-            </div>
-            <span class="health-text">${pokemon.hp} / ${pokemon.maxHp}</span>
-            <div class="battle-stats">
-                <div class="battle-stat">
-                    <span class="battle-stat-value">${pokemon.attack || '?'}</span>
-                    <span class="battle-stat-label">ATK</span>
-                </div>
-                <div class="battle-stat">
-                    <span class="battle-stat-value">${pokemon.maxHp}</span>
-                    <span class="battle-stat-label">HP</span>
-                </div>
-                <div class="battle-stat">
-                    <span class="battle-stat-value strength-badge ${tier.class}">${tier.name}</span>
-                    <span class="battle-stat-label">STR</span>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    const spriteSection = `
-        <div class="pokemon-sprite">
-            ${spriteContent}
-        </div>
-    `;
-    
-    // Enemy shows info first, player shows sprite first
-    const content = isEnemy 
-        ? infoSection + spriteSection 
-        : spriteSection + infoSection;
-    
-    return `
-        <div class="pokemon-battle-card ${isEnemy ? 'enemy' : 'player'}">
-            ${content}
-        </div>
-    `;
-}
-
-/**
- * Creates HTML for a loading placeholder card.
- * @returns {string} HTML string for loading card
- */
-function createLoadingCard() {
-    return `
-        <div class="pokemon-card loading">
-            <div class="card-sprite">
-                <div class="sprite-placeholder small loading-pulse">...</div>
-            </div>
-            <div class="card-info">
-                <span class="card-name">Loading...</span>
-                <div class="mini-health-bar">
-                    <div class="health-fill" style="width: 100%"></div>
-                </div>
-            </div>
-            <div class="card-status">Please wait</div>
-        </div>
-    `;
-}
 
 // ==========================================
 // Initialization
@@ -540,15 +338,8 @@ function setupBattleEventListeners() {
  * Loads user profile data and updates the UI.
  */
 function loadUserData() {
-    const profile = getUserProfile();
-    
-    // Update user badge in header
-    if (battleElements.userBadge) {
-        battleElements.userBadge.innerHTML = `
-            <div class="user-avatar">${profile.avatar}</div>
-            <span class="user-name">${profile.username}</span>
-        `;
-    }
+    // Update user badge in header using shared function
+    renderUserBadge();
     
     // Load battle progress (round and wins)
     const progress = loadBattleProgress();
@@ -697,29 +488,30 @@ function renderBattle() {
 function renderBattleArena() {
     const activePokemon = gameState.playerTeam[gameState.activePlayerPokemon];
     
-    // Render player's active Pokemon
-    battleElements.playerPokemon.innerHTML = createBattlePokemonCard(activePokemon, false);
+    // Render player's active Pokemon using template
+    battleElements.playerPokemon.innerHTML = createBattlePokemonCardTemplate(activePokemon, false, gameState.enemyPokemon);
     
-    // Render enemy Pokemon
-    battleElements.enemyPokemon.innerHTML = createBattlePokemonCard(gameState.enemyPokemon, true);
+    // Render enemy Pokemon using template
+    battleElements.enemyPokemon.innerHTML = createBattlePokemonCardTemplate(gameState.enemyPokemon, true, null);
 }
 
 /**
- * Renders the player's team using the component function.
+ * Renders the player's team using template functions.
  */
 function renderTeam() {
     if (gameState.isLoading) {
-        // Show loading cards
+        // Show loading cards using template
         battleElements.playerTeam.innerHTML = 
-            createLoadingCard() + createLoadingCard() + createLoadingCard();
+            createLoadingCardTemplate() + createLoadingCardTemplate() + createLoadingCardTemplate();
         return;
     }
     
     const teamHTML = gameState.playerTeam
-        .map((pokemon, index) => createPokemonCard(
+        .map((pokemon, index) => createPokemonCardTemplate(
             pokemon, 
             index, 
-            index === gameState.activePlayerPokemon
+            index === gameState.activePlayerPokemon,
+            gameState.enemyPokemon
         ))
         .join('');
     

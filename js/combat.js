@@ -64,19 +64,15 @@ function getTypeEffectiveness(attackerTypes, defenderTypes) {
 }
 
 /**
- * Gets a human-readable description of type effectiveness.
- * @param {string} attackType - The attacking type
- * @param {string} defendType - The defending type
- * @returns {string} Description of effectiveness
+ * Gets the battle message for type effectiveness.
+ * @param {number} typeMultiplier - The effectiveness multiplier
+ * @returns {string} Battle message describing effectiveness (or empty string if neutral)
  */
-function getEffectivenessDescription(attackType, defendType) {
-    const effectiveness = TYPE_EFFECTIVENESS[attackType]?.[defendType];
-    
-    if (effectiveness === undefined) return 'normal';
-    if (effectiveness === 0) return 'immune';
-    if (effectiveness >= 2) return 'super-effective';
-    if (effectiveness < 1) return 'not-effective';
-    return 'normal';
+function getEffectivenessDescription(typeMultiplier) {
+    if (typeMultiplier === 0) return "It has no effect...";
+    if (typeMultiplier >= 2) return "It's super effective!";
+    if (typeMultiplier < 1 && typeMultiplier > 0) return "It's not very effective...";
+    return '';
 }
 
 // ==========================================
@@ -121,15 +117,8 @@ function calculateDamage(attacker, defender) {
         damage = Math.max(1, damage);
     }
     
-    // Determine effectiveness message
-    let effectivenessMsg = '';
-    if (typeMultiplier === 0) {
-        effectivenessMsg = "It has no effect...";
-    } else if (typeMultiplier >= 2) {
-        effectivenessMsg = "It's super effective!";
-    } else if (typeMultiplier < 1 && typeMultiplier > 0) {
-        effectivenessMsg = "It's not very effective...";
-    }
+    // Determine effectiveness message using shared function
+    let effectivenessMsg = getEffectivenessDescription(typeMultiplier);
     
     if (isCritical && damage > 0) {
         effectivenessMsg = "Critical hit! " + effectivenessMsg;

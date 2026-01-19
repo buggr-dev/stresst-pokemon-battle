@@ -67,8 +67,8 @@ function loadProfileData() {
     selectedAvatar = profile.avatar;
     profileElements.currentAvatar.textContent = profile.avatar;
     
-    // Render user badge in header
-    renderHeaderBadge(profile);
+    // Render user badge in header using shared function
+    renderUserBadge();
     
     // Render avatar grid
     renderAvatarGrid('avatar-grid', handleAvatarSelect);
@@ -114,13 +114,13 @@ function handleAvatarSelect(avatar) {
 function handleSaveProfile() {
     const username = profileElements.usernameInput.value.trim() || 'Trainer';
     
-    const profile = updateUserProfile({
+    updateUserProfile({
         username: username,
         avatar: selectedAvatar
     });
     
-    // Update header badge to reflect changes
-    renderHeaderBadge(profile);
+    // Update header badge to reflect changes using shared function
+    renderUserBadge();
     
     // Show success message
     showSaveMessage();
@@ -143,19 +143,6 @@ function handleResetStats() {
 // ==========================================
 // UI Updates
 // ==========================================
-
-/**
- * Renders the user badge in the header.
- * @param {Object} profile - User profile object
- */
-function renderHeaderBadge(profile) {
-    if (profileElements.userBadge) {
-        profileElements.userBadge.innerHTML = `
-            <div class="user-avatar">${profile.avatar}</div>
-            <span class="user-name">${profile.username}</span>
-        `;
-    }
-}
 
 /**
  * Updates the stats display with profile data.

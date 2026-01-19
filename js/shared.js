@@ -369,11 +369,7 @@ function renderUserBadge() {
     if (!badgeContainer) return;
     
     const profile = getUserProfile();
-    
-    badgeContainer.innerHTML = `
-        <div class="user-avatar">${profile.avatar}</div>
-        <span class="user-name">${profile.username}</span>
-    `;
+    badgeContainer.innerHTML = createUserBadgeTemplate(profile);
 }
 
 /**
@@ -386,16 +382,7 @@ function renderAvatarGrid(containerId, onSelect) {
     if (!container) return;
     
     const profile = getUserProfile();
-    
-    container.innerHTML = AVATAR_OPTIONS.map(avatar => `
-        <button 
-            class="avatar-option ${avatar === profile.avatar ? 'selected' : ''}" 
-            data-avatar="${avatar}"
-            type="button"
-        >
-            ${avatar}
-        </button>
-    `).join('');
+    container.innerHTML = createAvatarGridTemplate(AVATAR_OPTIONS, profile.avatar);
     
     // Add click handlers
     container.querySelectorAll('.avatar-option').forEach(btn => {
